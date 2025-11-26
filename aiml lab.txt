@@ -150,7 +150,10 @@ sil_score = silhouette_score(X, labels)
 
 print(f"Inertia (Lower is better): {inertia:.2f}")
 print(f"Silhouette Score (Closer to 1 is better): {sil_score:.4f}")
-Progm 
+
+
+p
+
 
 
 
