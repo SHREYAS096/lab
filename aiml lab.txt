@@ -264,8 +264,310 @@ mae = accuracy.mae(predictions, verbose=False)
 print("\nPerformance Evaluation:")
 print(f"RMSE: {rmse:.4f}")
 print(f"MAE : {mae:.4f}")
-========================================================================================================== -              +
+========================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================= 
 
+
+1.ImplementasimplereflexagentinPythontonavigateagridenvironment,avoidingobstaclesand
+performingbasictasks.
+import time
+# 1. Environment Setup:Position [x,y], Goal (x,y), Obstacles {set}
+pos, goal = [0, 0], (4, 4)
+obs = {(1, 0), (1, 1),(2, 3), (3, 2)}
+print(f"Start: {pos} |Goal: {goal}")
+# 2. Main Loop (The Agent'sLifecycle)
+while tuple(pos) != goal:
+x, y = pos
+#---REFLEX LOGIC(Condition-> Action)--
+if x < goal[0] and(x + 1, y) not in obs:
+pos[0] += 1; action= "Right"
+elif y < goal[1] and(x, y + 1) not in obs:
+pos[1] += 1; action= "Down"
+else:
+print("Obstacledetected. Path blocked."); break
+print(f"Action: {action}-> New Pos: {pos}")
+time.sleep(0.5)
+if tuple(pos) == goal:print("Goal Reached!")
+
+
+
+2.Developagame-playingagentinPythonforTic-Tac-Toeusingtheminimaxalgorithm
+todetermineoptimalmoves.
+import math
+b = [" "] * 9
+w = [
+[0,1,2],[3,4,5],[6,7,8],
+[0,3,6],[1,4,7],[2,5,8],
+[0,4,8],[2,4,6]
+]
+def show():
+print("\n".join(["|".join(b[i:i+3]) for i in range(0,9,3)]))
+def win(p):
+return any(all(b[i] == p for i in c) for c in w)
+def full():
+return " " not in b
+def minimax(p):
+if win("O"): return1
+if win("X"): return-1
+if full(): return 0
+scores = []
+for i in range(9):
+if b[i] == " ":
+b[i] = p
+scores.append(minimax("X" if p=="O" else "O"))
+b[i] = " "
+return max(scores) ifp=="O" else min(scores)
+def best():
+best_move, best_score=-1,-math.inf
+for i in range(9):
+if b[i] == " ":
+b[i] = "O"
+score = minimax("X")
+b[i] = " "
+if score >best_score:
+best_score, best_move = score, i
+return best_move
+def play():
+print("You: X, Computer:O")
+show()
+while True:
+h = int(input("Move (1-9): "))-1
+if b[h] != " ":
+print("Invalid"); continue
+b[h] = "X"
+if win("X"): show(); print("You win!"); break
+if full(): show(); print("Draw!"); break
+c = best()
+b[c] = "O"
+print("\nComputer:", c+1)
+show()
+if win("O"): print("Computer wins!"); break
+if full(): print("Draw!"); break
+play()
+
+
+
+3.CreateaPythonscripttodemonstratetheuseofbasicprobabilitynotation,includingevents,outcomes,
+andprobabilityvalues
+import random
+def calculate_probability(f, t):
+returnf/t if t else 0
+def get_sample_space(choice):
+spaces = {
+"1": ([str(i)for i in range(1,7)], "Dice (1-6)"),
+"2": (["Heads", "Tails"], "Coin toss"),
+"3": (["Hearts", "Diamonds", "Clubs", "Spades"], "Card suits"),
+"4": (["0", "1"], "Binary")
+}
+if choice in spaces:
+return spaces[choice]
+if choice == "5":
+raw = input("Entercustom sample space: ")
+return [x.strip() for x in raw.split(",")], "Custom"
+returnNone, None
+def main():
+print("ProbabilityCalculator")
+print("1) Dice\n2) Coin\n3) Suits\n4) Binary\n5) Custom")
+while True:
+S, desc = get_sample_space(input("Choice (1-5): "))
+if S: break
+print("Invalidchoice.\n")
+print(f"\nSample Space: {desc}\nS = {S}\n")
+events = {}
+for _ in range(int(input("How many events? "))):
+name = input("Eventname: ")
+raw = input(f"Outcomesfor {name}: ")
+events[name] =[x.strip() for x in raw.split(",") if x.strip() in S]
+print("\nProbabilities:")
+for name, E in events.items():
+p = calculate_probability(len(E), len(S))
+print(f"{name}: {E} → P = {len(E)}/{len(S)} = {p:.2f}")
+main()
+
+
+
+4.WriteaprogramtoimplementKNearestNeighborsalgorithmtoclassifyirisdataset.Printbothcorrect
+andwrongprediction
+from sklearn.datasetsimport load_iris
+from sklearn.model_selectionimport train_test_split
+from sklearn.neighborsimport KNeighborsClassifier
+# Load dataset
+iris = load_iris()
+X = iris.data
+y = iris.target
+target_names = iris.target_names
+# Split dataset
+X_train, X_test, y_train, y_test = train_test_split(
+X, y, test_size=0.3, random_state=42
+)
+# KNN Classifier
+k = 5
+knn = KNeighborsClassifier(n_neighbors=k)
+knn.fit(X_train, y_train)
+# Predictions
+y_pred = knn.predict(X_test)
+print("Prediction Results:\n")
+for i in range(len(y_test)):
+actual = target_names[y_test[i]]
+predicted = target_names[y_pred[i]]
+if y_test[i] == y_pred[i]:
+print(f"Correct:Predicted = {predicted}, Actual = {actual}")
+else:
+print(f"Wrong:Predicted = {predicted}, Actual = {actual}")
+
+
+
+5.DevelopaprogramtoapplytheK-meansalgorithmtoclusteradatasetstoredin.CSVfile.Usethesame
+datasetfor clusteringusingtheEMalgorithm.Comparetheresultsofthesetwoalgorithmsandcomment
+ontheclusteringquality.
+import pandas as pd
+from sklearn.datasetsimport make_blobs
+from sklearn.cluster importKMeans
+from sklearn.mixture importGaussianMixture
+from sklearn.metrics importsilhouette_score
+# 0. Setup: Create a dummy.csv file for the demonstration
+X, _ = make_blobs(n_samples=300, centers=4, cluster_std=0.60, random_state=0)
+pd.DataFrame(X).to_csv("data.csv", index=False)
+# 1. Load Data
+data = pd.read_csv("data.csv")
+# 2. Run Algorithms
+# K-Means: Hard clustering(assigns point to nearest centroid)
+km_labels = KMeans(n_clusters=4).fit_predict(data)
+# EM (Gaussian Mixture):Soft clustering (probabilistic assignment)
+em_labels = GaussianMixture(n_components=4).fit_predict(data)
+# 3. Compare Quality (SilhouetteScore: closer to 1 is better)
+print(f"K-Means Score:{silhouette_score(data, km_labels):.3f}")
+print(f"EM (GMM) Score:{silhouette_score(data, em_labels):.3f}")
+# 4. Conclusion
+diff = silhouette_score(data, em_labels)-silhouette_score(data,km_labels)
+print(f"Result: {'EM'if diff > 0 else 'K-Means'} performed betterby
+{abs(diff):.3f}")
+
+
+
+6.DemonstrateaGeneticalgorithmbytakingsuitabledataforanysimpleapplication.
+import random
+#---Problem Setup--
+jobs = [2, 4, 6, 8, 3] # Job processing times
+POP_SIZE, GENS = 6, 15 # Population size, generations
+MUT_RATE = 0.2 # Mutation probability
+#---Fitness Function--
+def fitness(ch):
+m1 = sum(jobs[i] fori in range(len(jobs)) if ch[i]==0)
+m2 = sum(jobs[i] fori in range(len(jobs)) if ch[i]==1)
+return 1 / max(m1, m2) # smaller makespan = better fitness
+#---GA Functions--
+def select(pop):
+total = sum(fitness(c) for c in pop)
+r, s = random.random()*total, 0
+for c in pop:
+s += fitness(c)
+if s >= r:
+return c
+def crossover(p1, p2):
+pt = random.randint(1, len(p1)-2)
+return p1[:pt]+p2[pt:],p2[:pt]+p1[pt:]
+def mutate(ch):
+if random.random()< MUT_RATE:
+i = random.randint(0, len(ch)-1)
+ch[i] = 1-ch[i]
+return ch
+#---Initialize Population--
+pop = [[random.randint(0,1) for _ in jobs] for _ in range(POP_SIZE)]
+#---Main GA Loop--
+for g in range(GENS):
+new_pop = []
+while len(new_pop)< POP_SIZE:
+p1, p2 = select(pop), select(pop)
+c1, c2 = crossover(p1[:], p2[:])
+new_pop += [mutate(c1), mutate(c2)]
+pop = new_pop[:POP_SIZE]
+best = max(pop, key=fitness)
+print(f"Gen {g+1}: Best{best}, Makespan = {1/fitness(best):.2f}")
+#---Final Result--
+best = max(pop, key=fitness)
+m1 = sum(jobs[i] for iin range(len(jobs)) if best[i]==0)
+m2 = sum(jobs[i] for iin range(len(jobs)) if best[i]==1)
+print("\nBest schedule:", best)
+print(f"Machine 1 totaltime = {m1},\nMachine 2 total time = {m2}")
+print("Minimum Makespan=", max(m1, m2))
+
+
+
+7.ImplementmatrixfactorizationusingtheSVDalgorithminthesurpriselibraryontheMovieLens100k
+datasetandevaluateits
+performanceusingRMSE
+# Import necessary libraries
+from surprise import SVD, Dataset, Reader
+from surprise.model_selectionimport cross_validate
+# 1. Load the MovieLens100k dataset
+data = Dataset.load_builtin('ml-100k')
+# 2. Define the SVD algorithm
+algo = SVD()
+# 3. Evaluate the performanceusing cross-validation and RMSE
+results = cross_validate(algo, data, measures=['RMSE', 'MAE'], cv=5,
+verbose=True)
+# 4. Display average RMSEacross folds
+print(f"Average RMSE:{results['test_rmse'].mean():.4f}")
+print(f"Average MAE: {results['test_mae'].mean():.4f}")
+
+
+
+8.Implementabasicn-gramlanguagemodeltounderstandtextgenerationandevaluateitsperformance.
+import random, math
+from collections import defaultdict
+def prep(t): return t.lower().split()
+def ngrams(t, n): return [tuple(t[i:i+n]) for i in range(len(t)-n+1)]
+def build(t, n=2):
+m = defaultdict(lambda: defaultdict(int))
+for ng in ngrams(t, n): m[ng[:-1]][ng[-1]] += 1
+for p in m:
+s = sum(m[p].values())
+for w in m[p]: m[p][w] /= s
+return m
+def gen(m, l=20, seed=None):
+s = tuple(seed.split()) if seed else random.choice(list(m))
+out = list(s)
+for _ in range(l-len(s)):
+p = tuple(out[-len(s):])
+if p not in m: break
+out.append(random.choices(list(m[p]), list(m[p].values()))[0])
+return " ".join(out)
+def perplex(m, t, n=2):
+lp=0
+for ng in ngrams(t,n):
+p=m[ng[:-1]].get(ng[-1],1e-6)
+lp+=math.log(p)
+return math.exp(-lp/len(ngrams(t,n)))
+text = """Natural language processing enables computers to understand human language."""
+tok = prep(text)
+model = build(tok)
+print("Generated:", gen(model, 15, "language"))
+print("Perplexity:", perplex(model, tok))
+
+
+
+9.9.ExploretheTransformerarchitecturebyvisualizingitscomponents:Encoder,Decoder,andAttentionmechanisms.
+import networkx as nx
+import matplotlib.pyplot as plt
+G = nx.DiGraph()
+# Simple encoder & decoder layers
+enc = ["Enc1", "Enc2", "Enc3", "Enc4"]
+dec = ["Dec1", "Dec2", "Dec3", "Dec4"]
+G.add_nodes_from(enc + dec)
+# Encoder → Encoder, Decoder → Decoder
+for i in range(3):
+G.add_edge(enc[i], enc[i+1])
+G.add_edge(dec[i], dec[i+1])
+# Attention: every encoder connects to every decoder
+for e in enc:
+for d in dec:
+G.add_edge(e, d)
+# Positions for drawing
+pos = {n: (0, 4-i) for i,n in enumerate(enc)}
+pos.update({n: (3, 4-i) for i, n in enumerate(dec)})
+nx.draw(G, pos, with_labels=True, node_size=1500, node_color="lightblue", arrows=True)
+plt.title("Simple Transformer Encoder–Decoder Diagram")
+plt.show()
 
 
 
